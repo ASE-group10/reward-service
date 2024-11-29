@@ -39,6 +39,24 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
+
+
+			<!-- JUnit 4 Dependency -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
+
+			<!-- Other dependencies -->
+
+
+
+
+
+
+
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
@@ -50,6 +68,9 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+
+
 
 	<build>
 		<plugins>
