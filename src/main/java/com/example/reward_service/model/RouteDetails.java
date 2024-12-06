@@ -14,6 +14,30 @@ public class RouteDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Defines the primary key generation strategy
     private Long id;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public double getDistance() {
+        return distance;
+    }
+
+    public void setDistance(double distance) {
+        this.distance = distance;
+    }
+
+    public boolean isHealthCompliant() {
+        return healthCompliant;
+    }
+
+    public void setHealthCompliant(boolean healthCompliant) {
+        this.healthCompliant = healthCompliant;
+    }
+
     private double distance;
     private boolean healthCompliant;
 
