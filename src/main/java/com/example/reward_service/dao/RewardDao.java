@@ -1,20 +1,21 @@
 package com.example.reward_service.dao;
 
-import com.example.reward_service.model.Reward;
-import org.springframework.stereotype.Repository;
+import com.example.reward_service.entity.RewardEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-@Repository
+import com.example.reward_service.dao.RewardRepository;
+
+@Component
 public class RewardDao {
 
-    public boolean checkEligibility(Long userId, double distance, boolean isHealthCompliant) {
-        // Example: Eligible if distance > 1 km and route is health-compliant
-        return distance > 1.0 && isHealthCompliant;
-    }
+    @Autowired
+    private RewardRepository rewardRepository;
 
-    public Reward saveReward(Long userId, int points) {
-        // Simulating saving reward details in the database
-        System.out.println("Saving reward for user ID: " + userId + " with points: " + points);
-        // Now we are using the constructor that accepts (int, String)
-        return new Reward(points, "Reward saved successfully.");
+    public void saveReward(String userId, int points) {
+        RewardEntity rewardEntity = new RewardEntity();
+        rewardEntity.setUserId(userId);
+        rewardEntity.setRewardPoints(points);
+        rewardRepository.save(rewardEntity);
     }
 }
