@@ -24,6 +24,6 @@ public class RewardServiceController {
 
     @GetMapping("/hello-reward")
     public String getHelloData() {
-        return "Fuck!";
+        return "Hi from Reward Service!";
     }
 }
