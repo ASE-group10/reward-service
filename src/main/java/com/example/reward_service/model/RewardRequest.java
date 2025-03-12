@@ -1,11 +1,11 @@
 package com.example.reward_service.model;
 
 public class RewardRequest {
-
     private Long userId;
-    private RouteDetails routeDetails;  // RouteDetails object which contains distance and health compliance
+    private String transportMode;
+    private RouteDetails routeDetails;
 
-    // Getter and setter for userId
+    // Getters and Setters
     public Long getUserId() {
         return userId;
     }
@@ -14,7 +14,14 @@ public class RewardRequest {
         this.userId = userId;
     }
 
-    // Getter and setter for routeDetails
+    public String getTransportMode() {
+        return transportMode;
+    }
+
+    public void setTransportMode(String transportMode) {
+        this.transportMode = transportMode;
+    }
+
     public RouteDetails getRouteDetails() {
         return routeDetails;
     }
