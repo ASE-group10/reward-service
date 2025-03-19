@@ -8,7 +8,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/reward-service}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:reward-service}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     hikari:
       maximum-pool-size: ${SPRING_DATASOURCE_MAXIMUM_POOL_SIZE:1}
       pool-name: ${SPRING_DATASOURCE_POOL_NAME:HikariPool}

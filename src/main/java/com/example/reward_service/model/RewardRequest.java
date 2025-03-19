@@ -1,11 +1,18 @@
 package com.example.reward_service.model;
 
 public class RewardRequest {
-
     private Long userId;
-    private RouteDetails routeDetails;  // RouteDetails object which contains distance and health compliance
+    private RouteDetails routeDetails;
 
-    // Getter and setter for userId
+    public RewardRequest() {}
+
+    public RewardRequest(Long userId, RouteDetails routeDetails) {
+        this.userId = userId;
+        this.routeDetails = routeDetails;
+    }
+
+    // Getters and Setters
+
     public Long getUserId() {
         return userId;
     }
@@ -14,7 +21,6 @@ public class RewardRequest {
         this.userId = userId;
     }
 
-    // Getter and setter for routeDetails
     public RouteDetails getRouteDetails() {
         return routeDetails;
     }

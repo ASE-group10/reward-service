@@ -2,18 +2,17 @@ package com.example.reward_service.model;
 
 public class Reward {
     private int points;
-    private String status;  // Reward status (Valid, Invalid, etc.)
+    private String message;
 
-    // Default constructor
     public Reward() {}
 
-    // Constructor with parameters
-    public Reward(int points, String status) {
+    public Reward(int points, String message) {
         this.points = points;
-        this.status = status;
+        this.message = message;
     }
 
-    // Getter and Setter for points
+    // Getters and Setters
+
     public int getPoints() {
         return points;
     }
@@ -22,12 +21,11 @@ public class Reward {
         this.points = points;
     }
 
-    // Getter and Setter for status
-    public String getStatus() {
-        return status;
+    public String getMessage() {
+        return message;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setMessage(String message) {
+        this.message = message;
     }
 }
