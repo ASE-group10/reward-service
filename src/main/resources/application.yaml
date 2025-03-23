@@ -1,12 +1,32 @@
+# Root-level configuration (applies to all profiles)
 spring:
   application:
     name: reward-service
+  profiles:
+    active: local  # Activate the 'local' profile
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${auth0.domain}/  # For token validation
+          jwk-set-uri: ${auth0.domain}/.well-known/jwks.json
+  config:
+    activate:
+      on-profile: local
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+---
+# Profile-specific configuration for 'local'
+spring:
   config:
     activate:
       on-profile: local
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/reward-service}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://reward-database:5432/reward-service}  # Use container name in Docker
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     hikari:
@@ -22,5 +42,20 @@ spring:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: ${SPRING_JPA_SHOW_SQL:false}
 
+# Auth0 Configuration (MUST match user-profile-service settings)
+auth0:
+  domain: ${AUTH0_DOMAIN:sustainable-wayfinding.eu.auth0.com}  # Same as user-profile-service
+  audience: https://reward-service-api      # API identifier from Auth0 Dashboard
+  client-id: ${AUTH0_CLIENT_ID:YOUR_CLIENT_ID}                 # From Auth0 Application
+  client-secret: ${AUTH0_CLIENT_SECRET:YOUR_CLIENT_SECRET}     # From Auth0 Application
+  issuer: https://sustainable-wayfinding.eu.auth0.com/  # Token issuer
+
+# Additional Configuration
 app:
   base-url: ${REWARD_SERVICE_URL:http://localhost:8080}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
