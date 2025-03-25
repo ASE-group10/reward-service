@@ -1,5 +1,6 @@
 package com.example.reward_service.dao;
 
+import com.example.reward_service.entity.RewardEntity;
 import com.example.reward_service.model.Reward;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,22 +20,22 @@ public class RewardDaoTest {
     @Test
     public void testCheckEligibility() {
         // Test when the distance is greater than 1 km and health-compliant
-        boolean eligibility = rewardDao.checkEligibility(123L, 2.5, true);
+        boolean eligibility = rewardDao.checkEligibility("fdfdsfs", 2.5, true);
         assertTrue(eligibility, "User should be eligible when distance > 1 km and health-compliant.");
 
         // Test when the distance is less than or equal to 1 km
-        eligibility = rewardDao.checkEligibility(123L, 0.5, true);
+        eligibility = rewardDao.checkEligibility("dsdasd", 0.5, true);
         assertTrue(!eligibility, "User should not be eligible when distance <= 1 km.");
 
         // Test when health-compliant is false
-        eligibility = rewardDao.checkEligibility(123L, 2.5, false);
+        eligibility = rewardDao.checkEligibility("dsdadwwe", 2.5, false);
         assertTrue(!eligibility, "User should not be eligible when not health-compliant.");
     }
 
     @Test
     public void testSaveReward() {
         // Simulate saving reward and check if reward points are calculated correctly
-        Reward reward = rewardDao.saveReward(123L, 25);  // User 123 with 25 points
+        RewardEntity reward = rewardDao.saveReward("dasd2w2asd", 25);  // User 123 with 25 points
 
         // Check if the reward object is created with correct points and status
         assertEquals(25, reward.getPoints(), "Points should be 25.");

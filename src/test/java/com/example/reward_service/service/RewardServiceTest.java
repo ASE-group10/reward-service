@@ -1,6 +1,7 @@
 package com.example.reward_service.service;
 
 import com.example.reward_service.dao.RewardDao;
+import com.example.reward_service.entity.RewardEntity;
 import com.example.reward_service.model.Reward;
 import com.example.reward_service.model.RewardRequest;
 import com.example.reward_service.model.RouteDetails;
@@ -29,7 +30,7 @@ public class RewardServiceTest {
 
         // Create RewardRequest with sample data
         rewardRequest = new RewardRequest();
-        rewardRequest.setUserId(123L);
+        rewardRequest.setUserId("eeowfhewofh");
 
         RouteDetails routeDetails = new RouteDetails();
         routeDetails.setDistance(2.5);  // Set 2.5 km distance
@@ -41,13 +42,13 @@ public class RewardServiceTest {
     @Test
     public void testValidateAndCalculateReward_Eligible() {
         // Mock the behavior of checkEligibility() in RewardDao
-        when(rewardDao.checkEligibility(123L, 2.5, true)).thenReturn(true);
+        when(rewardDao.checkEligibility("efefsdfds", 2.5, true)).thenReturn(true);
 
         // Mock the saveReward() method in RewardDao
-        when(rewardDao.saveReward(123L, 25)).thenReturn(new Reward(25, "Reward saved successfully."));
+        when(rewardDao.saveReward("dsadasd", 25)).thenReturn(new RewardEntity("efwef", 25, "Reward saved successfully."));
 
         // Call the service method
-        Reward reward = rewardService.validateAndCalculateReward(rewardRequest);
+        RewardEntity reward = rewardService.validateAndCalculateReward("ewqwe",rewardRequest);
 
         // Assert the points and the status returned by the service
         assertEquals(25, reward.getPoints(), "Points should be 25.");
@@ -57,10 +58,10 @@ public class RewardServiceTest {
     @Test
     public void testValidateAndCalculateReward_NotEligible() {
         // Mock the behavior of checkEligibility() in RewardDao
-        when(rewardDao.checkEligibility(123L, 2.5, true)).thenReturn(false);
+        when(rewardDao.checkEligibility("123L", 2.5, true)).thenReturn(false);
 
         // Call the service method
-        Reward reward = rewardService.validateAndCalculateReward(rewardRequest);
+        RewardEntity reward = rewardService.validateAndCalculateReward("ewrwer",rewardRequest);
 
         // Assert the points and status when not eligible
         assertEquals(0, reward.getPoints(), "Points should be 0.");
