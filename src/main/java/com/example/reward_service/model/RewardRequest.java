@@ -1,24 +1,19 @@
 package com.example.reward_service.model;
 
 public class RewardRequest {
+    private String userId;  // Auth0 UserID (optional – can be set in the controller)
+    private RouteDetails routeDetails;  // Contains distance and health compliance details
 
-    private Long userId;
-    private RouteDetails routeDetails;  // RouteDetails object which contains distance and health compliance
-
-    // Getter and setter for userId
-    public Long getUserId() {
+    // Getters and Setters
+    public String getUserId() {
         return userId;
     }
-
-    public void setUserId(Long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
-
-    // Getter and setter for routeDetails
     public RouteDetails getRouteDetails() {
         return routeDetails;
     }
-
     public void setRouteDetails(RouteDetails routeDetails) {
         this.routeDetails = routeDetails;
     }

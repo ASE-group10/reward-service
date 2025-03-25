@@ -25,7 +25,7 @@ public class RewardServiceControllerTest {
     @BeforeEach
     public void setup() {
         rewardRequest = new RewardRequest();
-        rewardRequest.setUserId(123L);  // Set userId as Long
+        rewardRequest.setUserId("dwfwfw");  // Set userId as Long
 
         // Set up RouteDetails with distance and health compliance
         RouteDetails routeDetails = new RouteDetails();
