@@ -1,7 +1,9 @@
 package com.example.reward_service.controller;
 
 import com.example.reward_service.dao.RewardRepository;
+import com.example.reward_service.entity.CouponEntity;
 import com.example.reward_service.entity.RewardEntity;
+import com.example.reward_service.model.CouponInfo;
 import com.example.reward_service.model.RewardRequest;
 import com.example.reward_service.service.RewardService;
 import com.example.reward_service.utils.AuthUtils;
@@ -19,8 +21,8 @@ public class RewardServiceController {
     @Autowired
     private RewardRepository rewardRepository;
 
-    @PostMapping("/validate-reward")
-    public RewardEntity validateReward(@RequestHeader("Authorization") String token, @RequestBody RewardRequest rewardRequest) {
+    @PostMapping("/calculate-reward")
+    public RewardEntity calculateReward(@RequestHeader("Authorization") String token, @RequestBody RewardRequest rewardRequest) {
         // Extract Auth0 UserID from the JWT token.
         String auth0UserId = AuthUtils.getAuth0UserIdFromToken(token);
         // Optionally, set the extracted userId into the request model.
@@ -32,5 +34,9 @@ public class RewardServiceController {
     public List<RewardEntity> getRewards(@RequestHeader("Authorization") String token) {
         String auth0UserId = AuthUtils.getAuth0UserIdFromToken(token);
         return rewardRepository.findByUserId(auth0UserId);
+    }
+    @GetMapping("/coupon-info/{couponId}")
+    public CouponEntity getCouponInformation(@PathVariable String couponId) {
+        return rewardService.getCouponInformation(couponId);
     }
 }

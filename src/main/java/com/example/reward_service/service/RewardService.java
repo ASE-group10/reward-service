@@ -1,18 +1,25 @@
 package com.example.reward_service.service;
 
+import com.example.reward_service.dao.CouponRepository;
 import com.example.reward_service.dao.RewardDao;
 import com.example.reward_service.dao.RewardRepository;
+import com.example.reward_service.entity.CouponEntity;
 import com.example.reward_service.entity.RewardEntity;
+import com.example.reward_service.model.CouponInfo;
 import com.example.reward_service.model.RewardRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 @Service
 public class RewardService {
 
     @Autowired
     private RewardDao rewardDao;
+    @Autowired
+    private CouponRepository couponRepository;
 
     @Autowired
     private RewardRepository rewardRepository;
@@ -40,4 +47,25 @@ public class RewardService {
         }
         return rewardEntity;
     }
+    public CouponEntity getCouponInformation(String couponId) {
+        Optional<CouponEntity> couponOpt = couponRepository.findById(couponId);
+        if (!couponOpt.isPresent()) {
+            throw new RuntimeException("Coupon not found");
+        }
+
+        CouponEntity couponEntity = couponOpt.get();
+        return mapToCouponInfo(couponEntity);
+    }
+
+    private CouponEntity mapToCouponInfo(CouponEntity entity) {
+        CouponEntity info = new CouponEntity();
+        info.setCouponId(entity.getCouponId());
+        info.setCouponType(entity.getCouponType());
+        info.setCouponDesc(entity.getCouponDesc());
+        info.setCouponExpiryDateAndTime(entity.getCouponExpiryDateAndTime());
+        info.setCouponStatus(entity.getCouponStatus());
+        info.setCouponRewardPoints(entity.getCouponRewardPoints());
+        return info;
+    }
+}
 }
