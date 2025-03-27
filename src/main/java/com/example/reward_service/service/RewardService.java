@@ -68,4 +68,3 @@ public class RewardService {
         return info;
     }
 }
-}
