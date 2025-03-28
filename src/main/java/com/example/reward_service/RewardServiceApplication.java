@@ -1,5 +1,6 @@
 package com.example.reward_service;
 
+import com.example.reward_service.config.AwsSecretsInitializer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,7 +9,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class RewardServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RewardServiceApplication.class, args);
+		SpringApplication app = new SpringApplication(RewardServiceApplication.class);
+		app.addInitializers(new AwsSecretsInitializer());
+		app.run(args);
 	}
 
 }
