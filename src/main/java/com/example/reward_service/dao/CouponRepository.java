@@ -8,8 +8,4 @@ import java.util.List;
 
 @Repository
 public interface CouponRepository extends JpaRepository<CouponEntity, String> {
-    List<CouponEntity> findByUserId(Long userId);
-
-    // Example custom method if you need to filter by status or expiry:
-    List<CouponEntity> findByUserIdAndCouponStatus(Long userId, String couponStatus);
 }

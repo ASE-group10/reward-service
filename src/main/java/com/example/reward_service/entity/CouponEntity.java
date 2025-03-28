@@ -6,53 +6,51 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "coupons")
 public class CouponEntity {
+
     @Id
+    @Column(name = "couponid", nullable = false)
     private String couponId;
 
-    private Long userId;
+    @Column(name = "coupontype")
     private String couponType;
+
+    @Column(name = "coupondesc")
     private String couponDesc;
 
+    @Column(name = "couponexpirydateandtime")
     private LocalDateTime couponExpiryDateAndTime;
+
+    @Column(name = "couponstatus")
     private String couponStatus;
+
+    @Column(name = "couponrewardpoints")
     private int couponRewardPoints;
 
+    @Column(name = "valid")
     private boolean valid;
-    private boolean redeemed;
 
     // Constructors
     public CouponEntity() {}
 
-    public CouponEntity(String couponId, Long userId, String couponType, String couponDesc,
+    public CouponEntity(String couponId, String couponType, String couponDesc,
                         LocalDateTime couponExpiryDateAndTime, String couponStatus, int couponRewardPoints,
                         boolean valid, boolean redeemed) {
         this.couponId = couponId;
-        this.userId = userId;
         this.couponType = couponType;
         this.couponDesc = couponDesc;
         this.couponExpiryDateAndTime = couponExpiryDateAndTime;
         this.couponStatus = couponStatus;
         this.couponRewardPoints = couponRewardPoints;
         this.valid = valid;
-        this.redeemed = redeemed;
     }
 
-    // Getters and Setters for all fields
-
+    // Getters and Setters
     public String getCouponId() {
         return couponId;
     }
 
     public void setCouponId(String couponId) {
         this.couponId = couponId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getCouponType() {
@@ -101,13 +99,5 @@ public class CouponEntity {
 
     public void setValid(boolean valid) {
         this.valid = valid;
-    }
-
-    public boolean isRedeemed() {
-        return redeemed;
-    }
-
-    public void setRedeemed(boolean redeemed) {
-        this.redeemed = redeemed;
     }
 }
