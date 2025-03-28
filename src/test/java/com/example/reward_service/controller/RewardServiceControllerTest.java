@@ -1,6 +1,6 @@
 package com.example.reward_service.controller;
 
-import com.example.reward_service.model.Reward;
+import com.example.reward_service.entity.RewardEntity;
 import com.example.reward_service.model.RewardRequest;
 import com.example.reward_service.model.RouteDetails;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,59 +8,103 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class RewardServiceControllerTest {
+class RewardServiceControllerTest {
 
     @Autowired
-    private TestRestTemplate restTemplate;  // Used to perform HTTP requests
+    private TestRestTemplate restTemplate;
 
-    private RewardRequest rewardRequest;
+    private HttpHeaders headers;
+    private RewardRequest validRequest;
+    private RewardRequest invalidRequest;
 
     @BeforeEach
-    public void setup() {
-        rewardRequest = new RewardRequest();
-        rewardRequest.setUserId("dwfwfw");  // Set userId as Long
+    void setUp() {
+        // Setup test headers with mock token
+        headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer mock-token-123");
 
-        // Set up RouteDetails with distance and health compliance
-        RouteDetails routeDetails = new RouteDetails();
-        routeDetails.setDistance(2.5);  // Set distance to 2.5 km for testing
-        routeDetails.setHealthCompliant(true);  // Set health compliance to true for testing
+        // Valid request setup
+        validRequest = new RewardRequest();
+        RewardRequest.RouteDetails validRoute = new RewardRequest.RouteDetails();
+        validRoute.setDistance(5.0);
+        validRoute.setHealthCompliant(true);
+        validRequest.setRouteDetails(validRoute);
 
-        rewardRequest.setRouteDetails(routeDetails);  // Set RouteDetails in RewardRequest
+        // Invalid request setup
+        invalidRequest = new RewardRequest();
+        RewardRequest.RouteDetails invalidRoute = new RewardRequest.RouteDetails();
+        invalidRoute.setDistance(0.5);
+        invalidRoute.setHealthCompliant(false);
+        invalidRequest.setRouteDetails(invalidRoute);
     }
 
     @Test
-    public void testValidateReward() {
-        // The endpoint to test
-        String url = "/validate-reward";
+    void calculateReward_ValidRequest_ReturnsReward() {
+        HttpEntity<RewardRequest> entity = new HttpEntity<>(validRequest, headers);
 
-        // Create the HttpEntity with the RewardRequest as body
-        HttpEntity<RewardRequest> entity = new HttpEntity<>(rewardRequest);
+        ResponseEntity<RewardEntity> response = restTemplate.exchange(
+                "/calculate-reward",
+                HttpMethod.POST,
+                entity,
+                RewardEntity.class
+        );
 
-        // Call the endpoint and capture the response
-        ResponseEntity<Reward> response = restTemplate.exchange(url, HttpMethod.POST, entity, Reward.class);
-
-        // Assert the response status and the Reward data
-        assertEquals(200, response.getStatusCodeValue());  // Check HTTP status code
-        Reward reward = response.getBody();
-        assert reward != null;
-        assertEquals(25, reward.getPoints());  // 2.5 km * 10 points/km = 25 points
-        assertEquals("Reward saved successfully.", reward.getStatus());  // Update to match the actual response message
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(50, response.getBody().getPoints()); // 5.0 km * 10 points/km
     }
 
     @Test
-    public void testGetHelloData() {
-        // Perform GET request for the /hello-reward endpoint
-        ResponseEntity<String> response = restTemplate.getForEntity("/hello-reward", String.class);
+    void calculateReward_InvalidRequest_ReturnsZeroPoints() {
+        HttpEntity<RewardRequest> entity = new HttpEntity<>(invalidRequest, headers);
 
-        // Assert the response status and body
-        assertEquals(200, response.getStatusCodeValue());
-        assertEquals("Hello from Reward Service!", response.getBody());  // Ensure the correct message is returned
+        ResponseEntity<RewardEntity> response = restTemplate.exchange(
+                "/calculate-reward",
+                HttpMethod.POST,
+                entity,
+                RewardEntity.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(0, response.getBody().getPoints());
+    }
+
+    @Test
+    void getRewardsHistory_ValidUser_ReturnsList() {
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<RewardEntity[]> response = restTemplate.exchange(
+                "/rewards-history",
+                HttpMethod.GET,
+                entity,
+                RewardEntity[].class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+    }
+
+    @Test
+    void redeemCoupon_ValidRequest_ReturnsSuccess() {
+        HttpEntity<String> entity = new HttpEntity<>(
+                "{\"couponId\":\"COUPON-123\"}",
+                headers
+        );
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/coupons/redeem",
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().contains("redeemed successfully"));
     }
 }

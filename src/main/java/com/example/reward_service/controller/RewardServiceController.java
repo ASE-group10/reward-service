@@ -2,35 +2,52 @@ package com.example.reward_service.controller;
 
 import com.example.reward_service.dao.RewardRepository;
 import com.example.reward_service.entity.RewardEntity;
-import com.example.reward_service.model.RewardRequest;
+import com.example.reward_service.exception.AuthenticationException;
+import com.example.reward_service.model.*;
 import com.example.reward_service.service.RewardService;
 import com.example.reward_service.utils.AuthUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 public class RewardServiceController {
 
-    @Autowired
-    private RewardService rewardService;
+    private final RewardService rewardService;
+    private final RewardRepository rewardRepository;
 
-    @Autowired
-    private RewardRepository rewardRepository;
-
-    @PostMapping("/validate-reward")
-    public RewardEntity validateReward(@RequestHeader("Authorization") String token, @RequestBody RewardRequest rewardRequest) {
-        // Extract Auth0 UserID from the JWT token.
+    @PostMapping("/calculate-reward")
+    public ResponseEntity<RewardEntity> calculateReward(
+            @RequestHeader("Authorization") String token,
+            @RequestBody RewardRequest rewardRequest) {
         String auth0UserId = AuthUtils.getAuth0UserIdFromToken(token);
-        // Optionally, set the extracted userId into the request model.
         rewardRequest.setUserId(auth0UserId);
-        // Validate, calculate, and save the reward entry in the database.
-        return rewardService.validateAndCalculateReward(auth0UserId, rewardRequest);
+        return ResponseEntity.ok(rewardService.validateAndCalculateReward(auth0UserId, rewardRequest));
     }
-    @GetMapping("/rewards")
-    public List<RewardEntity> getRewards(@RequestHeader("Authorization") String token) {
+
+    @GetMapping("/rewards-history")
+    public ResponseEntity<List<RewardEntity>> getRewardsHistory(
+            @RequestHeader("Authorization") String token) {
         String auth0UserId = AuthUtils.getAuth0UserIdFromToken(token);
-        return rewardRepository.findByUserId(auth0UserId);
+        return ResponseEntity.ok(rewardRepository.findByUserId(auth0UserId));
+    }
+
+    @GetMapping("/coupons/eligible")
+    public ResponseEntity<List<CouponInfo>> getEligibleCoupons(
+            @RequestHeader("Authorization") String token) {
+        String auth0UserId = AuthUtils.getAuth0UserIdFromToken(token);
+        return ResponseEntity.ok(rewardService.getEligibleCoupons(auth0UserId));
+    }
+
+    @PostMapping("/coupons/redeem")
+    public ResponseEntity<String> redeemCoupon(
+            @RequestHeader("Authorization") String token,
+            @RequestBody RedeemRequest redeemRequest) {
+        String auth0UserId = AuthUtils.getAuth0UserIdFromToken(token);
+        rewardService.redeemCoupon(auth0UserId, redeemRequest.getCouponId());
+        return ResponseEntity.ok("Coupon " + redeemRequest.getCouponId() + " redeemed successfully!");
     }
 }

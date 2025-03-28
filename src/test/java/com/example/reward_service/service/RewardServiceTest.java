@@ -32,7 +32,7 @@ public class RewardServiceTest {
         rewardRequest = new RewardRequest();
         rewardRequest.setUserId("eeowfhewofh");
 
-        RouteDetails routeDetails = new RouteDetails();
+        RewardRequest.RouteDetails routeDetails = new RewardRequest.RouteDetails();
         routeDetails.setDistance(2.5);  // Set 2.5 km distance
         routeDetails.setHealthCompliant(true);  // Set health compliance to true
 
