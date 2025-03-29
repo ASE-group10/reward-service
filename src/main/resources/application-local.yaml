@@ -21,11 +21,10 @@ spring:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: ${SPRING_JPA_SHOW_SQL:false}
-auth0:
-  client-id: ${AUTH0_CLIENT_ID}
-  client-secret: ${AUTH0_CLIENT_SECRET}
-  issuer-uri: https://${AUTH0_DOMAIN}/
-  audience: ${AUTH0_AUDIENCE}
 
-app:
-  base-url: ${REWARD_SERVICE_URL:http://localhost:8080}
+pyroscope:
+  server:
+    address: ${PYROSCOPE_SERVER_ADDRESS:http://pyroscope:4040}
+  auth:
+    user: ${PYROSCOPE_AUTH_USER:admin}
+    password: ${PYROSCOPE_AUTH_PASSWORD:admin123}
