@@ -21,3 +21,10 @@ spring:
     hibernate:
       ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: ${SPRING_JPA_SHOW_SQL:false}
+
+pyroscope:
+  server:
+    address: ${PYROSCOPE_SERVER_ADDRESS}
+  auth:
+    user: ${PYROSCOPE_AUTH_USER}
+    password: ${PYROSCOPE_AUTH_PASSWORD}
