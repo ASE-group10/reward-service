@@ -70,6 +70,12 @@
 			<version>0.15.2</version>
 		</dependency>
 
+		<!-- Spring Security -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
 		<!-- AWS SDK for Secrets Manager -->
 		<dependency>
 			<groupId>software.amazon.awssdk</groupId>

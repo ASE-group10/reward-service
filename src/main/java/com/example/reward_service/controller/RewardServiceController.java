@@ -2,6 +2,7 @@ package com.example.reward_service.controller;
 
 import com.example.reward_service.dao.RewardRepository;
 import com.example.reward_service.entity.RewardEntity;
+import com.example.reward_service.entity.TotalRewardsEntity;
 import com.example.reward_service.exception.AuthenticationException;
 import com.example.reward_service.model.*;
 import com.example.reward_service.service.RewardService;
@@ -49,5 +50,13 @@ public class RewardServiceController {
         String auth0UserId = AuthUtils.getAuth0UserIdFromToken(token);
         rewardService.redeemCoupon(auth0UserId, redeemRequest.getCouponId());
         return ResponseEntity.ok("Coupon " + redeemRequest.getCouponId() + " redeemed successfully!");
+    }
+
+    @GetMapping("/total-rewards")
+    public ResponseEntity<TotalRewardsEntity> getTotalRewards(
+            @RequestHeader("Authorization") String token) {
+        String auth0UserId = AuthUtils.getAuth0UserIdFromToken(token);
+        TotalRewardsEntity totalRewardsEntity = rewardService.getTotalRewards(auth0UserId);
+        return ResponseEntity.ok(totalRewardsEntity);
     }
 }
