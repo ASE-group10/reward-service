@@ -22,6 +22,11 @@ public class RewardService {
     @Autowired private RewardRepository rewardRepository;
     @Autowired private UserCouponRepository userCouponRepository;
 
+    public TotalRewardsEntity getTotalRewards(String userId) {
+        return totalRewardsRepository.findById(userId)
+                .orElse(new TotalRewardsEntity(userId, 0));
+    }
+
     public RewardEntity validateAndCalculateReward(String auth0UserId, RewardRequest rewardRequest) {
         try {
             double distance = rewardRequest.getRouteDetails().getDistance();
