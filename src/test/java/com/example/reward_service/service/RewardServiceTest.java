@@ -1,10 +1,12 @@
 package com.example.reward_service.service;
 
 import com.example.reward_service.dao.RewardDao;
+import com.example.reward_service.dao.RewardRepository;
+import com.example.reward_service.dao.TotalRewardsRepository;
+import com.example.reward_service.dao.CouponRepository;
+import com.example.reward_service.dao.UserCouponRepository;
 import com.example.reward_service.entity.RewardEntity;
-import com.example.reward_service.model.Reward;
 import com.example.reward_service.model.RewardRequest;
-import com.example.reward_service.model.RouteDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -12,43 +14,61 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class RewardServiceTest {
 
     @Mock
-    private RewardDao rewardDao;  // Mocking RewardDao
+    private RewardDao rewardDao;
+
+    @Mock
+    private RewardRepository rewardRepository;
+
+    @Mock
+    private TotalRewardsRepository totalRewardsRepository;
+
+    @Mock
+    private CouponRepository couponRepository;
+
+    @Mock
+    private UserCouponRepository userCouponRepository;
 
     @InjectMocks
-    private RewardService rewardService;  // RewardService with injected mocked RewardDao
+    private RewardService rewardService;
 
     private RewardRequest rewardRequest;
+    private String testUserId = "test-user-id";
 
     @BeforeEach
     public void setup() {
-        MockitoAnnotations.openMocks(this);  // Initialize mocks
+        MockitoAnnotations.openMocks(this);
 
         // Create RewardRequest with sample data
         rewardRequest = new RewardRequest();
-        rewardRequest.setUserId("eeowfhewofh");
+        rewardRequest.setUserId(testUserId);
 
         RewardRequest.RouteDetails routeDetails = new RewardRequest.RouteDetails();
-        routeDetails.setDistance(2.5);  // Set 2.5 km distance
-        routeDetails.setHealthCompliant(true);  // Set health compliance to true
+        routeDetails.setDistance(2.5); // Set 2.5 km distance
+        routeDetails.setHealthCompliant(true); // Set health compliance to true
 
-        rewardRequest.setRouteDetails(routeDetails);  // Set RouteDetails in RewardRequest
+        rewardRequest.setRouteDetails(routeDetails); // Set RouteDetails in RewardRequest
     }
 
     @Test
     public void testValidateAndCalculateReward_Eligible() {
         // Mock the behavior of checkEligibility() in RewardDao
-        when(rewardDao.checkEligibility("efefsdfds", 2.5, true)).thenReturn(true);
+        when(rewardDao.checkEligibility(testUserId, 2.5, true)).thenReturn(true);
 
         // Mock the saveReward() method in RewardDao
-        when(rewardDao.saveReward("dsadasd", 25)).thenReturn(new RewardEntity("efwef", 25, "Reward saved successfully."));
+        RewardEntity savedReward = new RewardEntity(testUserId, 25, "Reward saved successfully.");
+        when(rewardDao.saveReward(testUserId, 25)).thenReturn(savedReward);
+
+        // Mock rewardRepository.save() method
+        when(rewardRepository.save(any(RewardEntity.class))).thenReturn(savedReward);
 
         // Call the service method
-        RewardEntity reward = rewardService.validateAndCalculateReward("ewqwe",rewardRequest);
+        RewardEntity reward = rewardService.validateAndCalculateReward(testUserId, rewardRequest);
 
         // Assert the points and the status returned by the service
         assertEquals(25, reward.getPoints(), "Points should be 25.");
@@ -58,13 +78,18 @@ public class RewardServiceTest {
     @Test
     public void testValidateAndCalculateReward_NotEligible() {
         // Mock the behavior of checkEligibility() in RewardDao
-        when(rewardDao.checkEligibility("123L", 2.5, true)).thenReturn(false);
+        when(rewardDao.checkEligibility(testUserId, 2.5, true)).thenReturn(false);
+
+        // Create and mock the ineligible reward entity
+        RewardEntity ineligibleReward = new RewardEntity(testUserId, 0, "User is not eligible for a reward.");
+        when(rewardRepository.save(any(RewardEntity.class))).thenReturn(ineligibleReward);
 
         // Call the service method
-        RewardEntity reward = rewardService.validateAndCalculateReward("ewrwer",rewardRequest);
+        RewardEntity reward = rewardService.validateAndCalculateReward(testUserId, rewardRequest);
 
         // Assert the points and status when not eligible
         assertEquals(0, reward.getPoints(), "Points should be 0.");
-        assertEquals("User is not eligible for a reward.", reward.getStatus(), "Status should be 'User is not eligible for a reward.'");
+        assertEquals("User is not eligible for a reward.", reward.getStatus(),
+                "Status should be 'User is not eligible for a reward.'");
     }
 }
