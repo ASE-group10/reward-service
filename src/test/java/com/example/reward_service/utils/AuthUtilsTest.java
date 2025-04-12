@@ -1,12 +1,14 @@
 package com.example.reward_service.utils;
 
 import com.example.reward_service.exception.AuthenticationException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AuthUtilsTest {
 
@@ -14,10 +16,17 @@ public class AuthUtilsTest {
     private static final String VALID_TOKEN = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhdXRoMHwxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     private static final String EXPECTED_USER_ID = "auth0|1234567890";
 
+    private AuthUtils authUtils;
+
+    @BeforeEach
+    void setUp() {
+        authUtils = new AuthUtils();
+    }
+
     @Test
     void testGetAuth0UserIdFromToken_ValidToken() {
         // Act
-        String userId = AuthUtils.getAuth0UserIdFromToken(VALID_TOKEN);
+        String userId = authUtils.getAuth0UserIdFromToken(VALID_TOKEN);
         // Assert
         assertEquals(EXPECTED_USER_ID, userId);
     }
@@ -27,7 +36,7 @@ public class AuthUtilsTest {
         // Arrange: token without "Bearer " prefix
         String token = VALID_TOKEN.replace("Bearer ", "");
         // Act
-        String userId = AuthUtils.getAuth0UserIdFromToken(token);
+        String userId = authUtils.getAuth0UserIdFromToken(token);
         // Assert
         assertEquals(EXPECTED_USER_ID, userId);
     }
@@ -42,8 +51,7 @@ public class AuthUtilsTest {
         // Act & Assert: should throw an AuthenticationException for invalid tokens
         AuthenticationException exception = assertThrows(
                 AuthenticationException.class,
-                () -> AuthUtils.getAuth0UserIdFromToken(invalidToken)
-        );
+                () -> authUtils.getAuth0UserIdFromToken(invalidToken));
         assertEquals("Invalid authentication token", exception.getMessage());
     }
 
@@ -51,11 +59,11 @@ public class AuthUtilsTest {
     @NullAndEmptySource
     @ValueSource(strings = { " ", "  " })
     void testGetAuth0UserIdFromToken_EmptyOrNullToken(String emptyToken) {
-        // Act & Assert: should throw an AuthenticationException for empty or null tokens
+        // Act & Assert: should throw an AuthenticationException for empty or null
+        // tokens
         AuthenticationException exception = assertThrows(
                 AuthenticationException.class,
-                () -> AuthUtils.getAuth0UserIdFromToken(emptyToken)
-        );
+                () -> authUtils.getAuth0UserIdFromToken(emptyToken));
         assertEquals("Invalid authentication token", exception.getMessage());
     }
 }
