@@ -7,6 +7,9 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 public class AuthUtils {
     public static String getAuth0UserIdFromToken(String token) {
+        if (token == null || token.trim().isEmpty()) {
+        }
+
         try {
             DecodedJWT jwt = JWT.decode(token.replace("Bearer ", ""));
             return jwt.getSubject();
