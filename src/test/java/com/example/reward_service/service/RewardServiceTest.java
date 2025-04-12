@@ -1,3 +1,4 @@
+// File: RewardServiceTest.java
 package com.example.reward_service.service;
 
 import com.example.reward_service.dao.RewardDao;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class RewardServiceTest {
+class RewardServiceTest {
 
     @Mock
     private RewardDao rewardDao;
@@ -72,7 +73,8 @@ public class RewardServiceTest {
 
         // Assert the points and the status returned by the service
         assertEquals(25, reward.getPoints(), "Points should be 25.");
-        assertEquals("Reward saved successfully.", reward.getStatus(), "Status should be 'Reward saved successfully.'");
+        assertEquals("Reward saved successfully.", reward.getStatus(),
+                "Status should be 'Reward saved successfully.'");
     }
 
     @Test
