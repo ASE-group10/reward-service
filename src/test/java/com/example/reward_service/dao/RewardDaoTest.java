@@ -1,44 +1,46 @@
+// File: RewardDaoTest.java
 package com.example.reward_service.dao;
 
 import com.example.reward_service.entity.RewardEntity;
-import com.example.reward_service.model.Reward;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class RewardDaoTest {
 
+    @InjectMocks
     private RewardDao rewardDao;
 
-    @BeforeEach
-    public void setup() {
-        rewardDao = new RewardDao();  // Initialize RewardDao
+    @Mock
+    private RewardRepository rewardRepository;
+
+    @Test
+    void testCheckEligibility() {
+        // Eligible if distance >= 1 and health compliant is true.
+        assertTrue(rewardDao.checkEligibility("anyUser", 1.0, true));
+        assertTrue(rewardDao.checkEligibility("anyUser", 2.0, true));
+        // Ineligible cases
+        assertFalse(rewardDao.checkEligibility("anyUser", 0.5, true));
+        assertFalse(rewardDao.checkEligibility("anyUser", 2.0, false));
     }
 
     @Test
-    public void testCheckEligibility() {
-        // Test when the distance is greater than 1 km and health-compliant
-        boolean eligibility = rewardDao.checkEligibility("fdfdsfs", 2.5, true);
-        assertTrue(eligibility, "User should be eligible when distance > 1 km and health-compliant.");
+    void testSaveReward() {
+        String userId = "user123";
+        int points = 50;
+        RewardEntity rewardEntity = new RewardEntity(userId, points);
+        rewardEntity.setName("Reward for user " + userId);
+        when(rewardRepository.save(any(RewardEntity.class))).thenReturn(rewardEntity);
 
-        // Test when the distance is less than or equal to 1 km
-        eligibility = rewardDao.checkEligibility("dsdasd", 0.5, true);
-        assertTrue(!eligibility, "User should not be eligible when distance <= 1 km.");
-
-        // Test when health-compliant is false
-        eligibility = rewardDao.checkEligibility("dsdadwwe", 2.5, false);
-        assertTrue(!eligibility, "User should not be eligible when not health-compliant.");
-    }
-
-    @Test
-    public void testSaveReward() {
-        // Simulate saving reward and check if reward points are calculated correctly
-        RewardEntity reward = rewardDao.saveReward("dasd2w2asd", 25);  // User 123 with 25 points
-
-        // Check if the reward object is created with correct points and status
-        assertEquals(25, reward.getPoints(), "Points should be 25.");
-        assertEquals("Reward saved successfully.", reward.getStatus(), "Status should be 'Reward saved successfully.'");
+        RewardEntity saved = rewardDao.saveReward(userId, points);
+        assertNotNull(saved);
+        assertEquals(userId, saved.getUserId());
+        assertEquals(points, saved.getPoints());
+        assertEquals("Reward for user " + userId, saved.getName());
     }
 }

@@ -18,19 +18,16 @@ public class AuthUtilsTest {
     void testGetAuth0UserIdFromToken_ValidToken() {
         // Act
         String userId = AuthUtils.getAuth0UserIdFromToken(VALID_TOKEN);
-
         // Assert
         assertEquals(EXPECTED_USER_ID, userId);
     }
 
     @Test
     void testGetAuth0UserIdFromToken_ValidTokenWithoutBearer() {
-        // Arrange - token without "Bearer " prefix
+        // Arrange: token without "Bearer " prefix
         String token = VALID_TOKEN.replace("Bearer ", "");
-
         // Act
         String userId = AuthUtils.getAuth0UserIdFromToken(token);
-
         // Assert
         assertEquals(EXPECTED_USER_ID, userId);
     }
@@ -42,11 +39,11 @@ public class AuthUtilsTest {
             "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" // Incomplete token
     })
     void testGetAuth0UserIdFromToken_InvalidTokenFormat(String invalidToken) {
-        // Act & Assert
+        // Act & Assert: should throw an AuthenticationException for invalid tokens
         AuthenticationException exception = assertThrows(
                 AuthenticationException.class,
-                () -> AuthUtils.getAuth0UserIdFromToken(invalidToken));
-
+                () -> AuthUtils.getAuth0UserIdFromToken(invalidToken)
+        );
         assertEquals("Invalid authentication token", exception.getMessage());
     }
 
@@ -54,11 +51,11 @@ public class AuthUtilsTest {
     @NullAndEmptySource
     @ValueSource(strings = { " ", "  " })
     void testGetAuth0UserIdFromToken_EmptyOrNullToken(String emptyToken) {
-        // Act & Assert
+        // Act & Assert: should throw an AuthenticationException for empty or null tokens
         AuthenticationException exception = assertThrows(
                 AuthenticationException.class,
-                () -> AuthUtils.getAuth0UserIdFromToken(emptyToken));
-
+                () -> AuthUtils.getAuth0UserIdFromToken(emptyToken)
+        );
         assertEquals("Invalid authentication token", exception.getMessage());
     }
 }
