@@ -1,14 +1,21 @@
-name: Build
+name: Reward Service Build
 
 on:
   push:
     branches:
       - main
+    paths:
+      - 'reward-service/**'  # Only trigger when changes are made to the reward-service
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
   build:
-    name: Build, Test, and SonarQube Analysis
+    name: Build and Test Reward Service
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./reward-service  # Set default working directory to reward-service
+    
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -21,46 +28,8 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       
-      - name: Verify Java Versions
-        run: |
-          java --version
-          javac --version
-
-      - name: Build Project and Generate Coverage Report
-        run: mvn clean verify jacoco:report
-
-      - name: Debug List Target Directory
-        run: |
-          echo "---- Debug Info: Listing 'target' directory contents ----"
-          ls -la target || echo "No 'target' directory found."
-          echo "---- Debug Info: Listing 'target/site/jacoco' directory contents ----"
-          ls -la target/site/jacoco 2>/dev/null || echo "'target/site/jacoco' directory not found."
-
-      - name: Verify Coverage Report Path
-        run: |
-          echo "---- Checking for 'target/site/jacoco' directory existence ----"
-          if [ ! -d "target/site/jacoco" ] || [ -z "$(ls -A target/site/jacoco)" ]; then
-            echo "ERROR: Coverage report directory 'target/site/jacoco' is missing or empty."
-            exit 1
-          else
-            echo "SUCCESS: Coverage report directory 'target/site/jacoco' exists and has content."
-          fi
-
-      - name: Upload Coverage Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: target/site/jacoco/*
-
-      - name: List Coverage Files
-        run: ls -R target/site/jacoco || echo "No coverage files found."
-
-      - name: Cache SonarQube Packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
+      - name: Verify Java Version
+        run: java --version
 
       - name: Cache Maven Packages
         uses: actions/cache@v3
@@ -69,9 +38,40 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
 
-      - name: Build and SonarQube Analysis
+      - name: Make mvnw Executable
+        run: chmod +x ./mvnw
+
+      - name: Build and Test Reward Service
+        run: ./mvnw clean verify jacoco:report
+
+      - name: Debug Target Directory
+        run: |
+          echo "---- Listing target directory contents ----"
+          ls -la target || echo "No target directory found."
+          
+          if [ -d "target/site/jacoco" ]; then
+            echo "---- Listing JaCoCo reports ----"
+            ls -la target/site/jacoco
+          else
+            echo "No JaCoCo reports found."
+            mkdir -p target/site/jacoco
+          fi
+
+      - name: Upload Coverage Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: reward-service-coverage
+          path: reward-service/target/site/jacoco/*
+          if-no-files-found: warn
+
+      - name: SonarQube Analysis
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Provided automatically
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Reward-Service-Check
+        run: >
+          ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+          -Dsonar.projectKey=Reward-Service-Check
+          -Dsonar.projectName="Reward Service"
+          -Dsonar.java.coveragePlugin=jacoco
+          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
