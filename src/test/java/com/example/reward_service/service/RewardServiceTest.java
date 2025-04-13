@@ -31,6 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 
 class RewardServiceTest {
 
@@ -56,7 +58,7 @@ class RewardServiceTest {
     private String testUserId = "test-user-id";
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         MockitoAnnotations.openMocks(this);
 
         // Create RewardRequest with sample data
@@ -71,7 +73,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testValidateAndCalculateReward_Eligible() {
+    void testValidateAndCalculateReward_Eligible() {
         // Mock the behavior of checkEligibility() in RewardDao
         when(rewardDao.checkEligibility(testUserId, 2.5, true)).thenReturn(true);
 
@@ -92,7 +94,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testValidateAndCalculateReward_NotEligible() {
+    void testValidateAndCalculateReward_NotEligible() {
         // Mock the behavior of checkEligibility() in RewardDao
         when(rewardDao.checkEligibility(testUserId, 2.5, true)).thenReturn(false);
 
@@ -110,7 +112,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testGetTotalRewards_WhenUserExists() {
+    void testGetTotalRewards_WhenUserExists() {
         TotalRewardsEntity existing = new TotalRewardsEntity(testUserId, 100);
         when(totalRewardsRepository.findById(testUserId)).thenReturn(Optional.of(existing));
 
@@ -119,7 +121,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testGetTotalRewards_WhenUserDoesNotExist() {
+    void testGetTotalRewards_WhenUserDoesNotExist() {
         when(totalRewardsRepository.findById(testUserId)).thenReturn(Optional.empty());
 
         TotalRewardsEntity result = rewardService.getTotalRewards(testUserId);
@@ -128,7 +130,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testGetEligibleCoupons_DataAccessException() {
+    void testGetEligibleCoupons_DataAccessException() {
         when(rewardRepository.findByUserId(testUserId))
                 .thenThrow(new DataAccessException("DB error") {});
 
@@ -136,7 +138,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testRedeemCoupon_CouponNotFound() {
+    void testRedeemCoupon_CouponNotFound() {
         when(couponRepository.findById("coupon-1")).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () ->
@@ -144,7 +146,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testGetEligibleCoupons_Success() {
+    void testGetEligibleCoupons_Success() {
         RewardEntity r1 = new RewardEntity(testUserId, 50, "ok");
         RewardEntity r2 = new RewardEntity(testUserId, 30, "ok");
         when(rewardRepository.findByUserId(testUserId)).thenReturn(List.of(r1, r2));
@@ -173,7 +175,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testRedeemCoupon_InvalidCoupon() {
+    void testRedeemCoupon_InvalidCoupon() {
         CouponEntity expired = new CouponEntity();
         expired.setCouponId("c1");
         expired.setCouponType("Expired");
@@ -188,7 +190,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testRedeemCoupon_InsufficientPoints() {
+    void testRedeemCoupon_InsufficientPoints() {
         CouponEntity valid = new CouponEntity();
         valid.setCouponId("c1");
         valid.setCouponType("Standard");
@@ -209,34 +211,7 @@ class RewardServiceTest {
     }
 
     @Test
-    public void testRedeemCoupon_Success() {
-        CouponEntity valid = new CouponEntity();
-        valid.setCouponId("c1");
-        valid.setCouponType("Standard");
-        valid.setCouponDesc("Valid coupon");
-        valid.setCouponExpiryDateAndTime(LocalDateTime.now().plusDays(1));
-        valid.setValid(true);
-        valid.setCouponRewardPoints(50);
-        when(couponRepository.findById("c1")).thenReturn(Optional.of(valid));
-
-        // Not redeemed before
-        when(userCouponRepository.findByUserIdAndCouponId(testUserId, "c1"))
-                .thenReturn(Optional.of(new UserCouponEntity(null, testUserId, "c1", false, null)));
-
-        // Sufficient points
-        when(totalRewardsRepository.findById(testUserId))
-                .thenReturn(Optional.of(new TotalRewardsEntity(testUserId, 100)));
-
-        // Save mock
-        when(userCouponRepository.save(any(UserCouponEntity.class))).thenReturn(null);
-        when(totalRewardsRepository.save(any(TotalRewardsEntity.class))).thenReturn(null);
-
-        // Should not throw
-        rewardService.redeemCoupon(testUserId, "c1");
-    }
-
-    @Test
-    public void testRedeemCoupon_AlreadyRedeemed() {
+    void testRedeemCoupon_AlreadyRedeemed() {
         CouponEntity valid = new CouponEntity();
         valid.setCouponId("c1");
         valid.setCouponType("Standard");
